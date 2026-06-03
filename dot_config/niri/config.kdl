@@ -1,0 +1,204 @@
+// niri config — translated from ~/.config/sway/{config,variables,autostart,noctalia}
+// Compositor: niri (scrolling Wayland compositor)
+// Reference:  https://github.com/niri-wm/niri/wiki/Configuration:-Introduction
+
+// ---------------------------------------------------------------------------
+// Input
+// ---------------------------------------------------------------------------
+
+input {
+    keyboard {
+        xkb { }
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+    }
+
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+// ---------------------------------------------------------------------------
+// Outputs
+// ---------------------------------------------------------------------------
+
+// niri automatically disables eDP-1 when the lid is closed and re-enables it
+// on open, so no explicit switch-events block is needed for lid handling.
+
+output "Acer Technologies X34 GS 0x03904FF0" {
+    mode "3440x1440@100"
+}
+
+// ---------------------------------------------------------------------------
+// Autostart
+// ---------------------------------------------------------------------------
+
+spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-at-startup "fcitx5" "-d"
+
+// ---------------------------------------------------------------------------
+// Layout
+// ---------------------------------------------------------------------------
+layout {
+    gaps 10
+    center-focused-column "on-overflow" // Don’t auto-center focused column
+
+    struts {}
+
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.33333
+        proportion 0.25
+    }
+
+    tab-indicator {
+        place-within-column
+    }
+
+}
+
+// ---------------------------------------------------------------------------
+// Window Rules
+// ---------------------------------------------------------------------------
+
+window-rule {
+    geometry-corner-radius 20 // Set every window radius to 20
+    clip-to-geometry true
+}
+
+
+// ---------------------------------------------------------------------------
+// Named workspaces provide stable workspace identities across monitors.
+// "1" is still the same workspace even after moving it to another output.
+// ---------------------------------------------------------------------------
+
+workspace "1"
+workspace "2"
+workspace "3"
+workspace "4"
+workspace "5"
+workspace "6"
+workspace "7"
+workspace "8"
+workspace "9"
+workspace "10"
+
+// ---------------------------------------------------------------------------
+// Key bindings
+// ---------------------------------------------------------------------------
+// Modifier conventions (matching Sway):
+//   Alt  ($Mod / Mod1) — primary modifier for window management
+//   Super (Mod4)       — used only for lock screen (Super+Shift+q)
+//
+// niri scrolling model notes:
+//   - left/right navigate between columns
+//   - up/down navigate windows within a column stack
+//   - no manual split direction; columns stack vertically automatically
+//   - resize mode omitted; use mouse drag or Mod+R preset cycling
+
+binds {
+    // --- Applications -------------------------------------------------------
+    Alt+w                { close-window; }
+    Alt+t repeat=false   { spawn "ghostty"; }
+    Alt+d repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
+    Alt+g repeat=false   { spawn "firefox"; }
+    Alt+f repeat=false   { spawn "nautilus"; }
+    Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
+    // Alt+Shift+c repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
+
+    // Lock screen (Super+Shift+q — mirrors Mod4+Shift+q in Sway)
+    Super+Ctrl+q repeat=false allow-inhibiting=false {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock";
+    }
+
+    // Session menu (Alt+Shift+e)
+    Alt+Shift+e repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }
+
+    // --- Window state -------------------------------------------------------
+    Alt+Shift+space      { toggle-window-floating; }
+    Alt+Shift+r          { switch-preset-column-width; }
+    Alt+Shift+t           { toggle-column-tabbed-display; }
+    Alt+Shift+f          { maximize-column; }
+    Alt+F11		{fullscreen-window;}
+
+    // Show hotkey overlay
+    Alt+Shift+slash repeat=false { show-hotkey-overlay; }
+
+    // --- Focus — arrow keys -------------------------------------------------
+    Alt+Left             { focus-column-left; }
+    Alt+Down             { focus-window-or-workspace-down; }
+    Alt+Up               { focus-window-or-workspace-up; }
+    Alt+Right            { focus-column-right; }
+
+    // --- Move — arrow keys --------------------------------------------------
+    //Alt+Shift+Left       { move-column-left; }
+    Alt+Shift+Left       { consume-or-expel-window-left; }
+    Alt+Shift+Down       { move-window-down; }
+    Alt+Shift+Up         { move-window-up; }
+//    Alt+Shift+Right      { move-column-right; }
+    Alt+Shift+Right      { consume-or-expel-window-right; }
+
+    // --- Overview -----------------------------------------------------------
+    Alt+Tab repeat=false { open-overview; }
+    Alt+Shift+Tab repeat=false { move-workspace-to-monitor-next; }
+
+    // --- Workspaces ---------------------------------------------------------
+    Super+Shift+Up   repeat=false { move-column-to-workspace-up; }
+    Super+Shift+Down repeat=false { move-column-to-workspace-down; }
+    Super+Shift+Tab repeat=false { move-column-to-monitor-next; }
+
+    Alt+1 { focus-workspace "1"; }
+    Alt+2 { focus-workspace "2"; }
+    Alt+3 { focus-workspace "3"; }
+    Alt+4 { focus-workspace "4"; }
+    Alt+5 { focus-workspace "5"; }
+    Alt+6 { focus-workspace "6"; }
+    Alt+7 { focus-workspace "7"; }
+    Alt+8 { focus-workspace "8"; }
+    Alt+9 { focus-workspace "9"; }
+    Alt+0 { focus-workspace "10"; }
+
+    Alt+Shift+1 { move-window-to-workspace "1"; }
+    Alt+Shift+2 { move-window-to-workspace "2"; }
+    Alt+Shift+3 { move-window-to-workspace "3"; }
+    Alt+Shift+4 { move-window-to-workspace "4"; }
+    Alt+Shift+5 { move-window-to-workspace "5"; }
+    Alt+Shift+6 { move-window-to-workspace "6"; }
+    Alt+Shift+7 { move-window-to-workspace "7"; }
+    Alt+Shift+8 { move-window-to-workspace "8"; }
+    Alt+Shift+9 { move-window-to-workspace "9"; }
+    Alt+Shift+0 { move-window-to-workspace "10"; }
+
+    // --- Media keys (allow-when-locked mirrors Sway --locked) ---------------
+    XF86AudioPlay allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "playPause";
+    }
+    XF86AudioNext allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "next";
+    }
+    XF86AudioPrev allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "previous";
+    }
+    XF86AudioMute allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput";
+    }
+    XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase";
+    }
+    XF86AudioLowerVolume allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease";
+    }
+
+    // --- Brightness keys ----------------------------------------------------
+    XF86MonBrightnessUp allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase";
+    }
+    XF86MonBrightnessDown allow-when-locked=true {
+        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease";
+    }
+}
+
+
+include "./noctalia.kdl"
+
