@@ -1,6 +1,14 @@
-// niri config — translated from ~/.config/sway/{config,variables,autostart,noctalia}
 // Compositor: niri (scrolling Wayland compositor)
 // Reference:  https://niri-wm.github.io/niri/Configuration:-Introduction.html
+
+// remove CSD
+prefer-no-csd
+
+// compatibility with token serial switch to enable click and focus on notifications
+debug {
+    // Allows notification actions and window activation from Noctalia.
+    honor-xdg-activation-with-invalid-serial
+}
 
 // ---------------------------------------------------------------------------
 // Input
@@ -63,7 +71,7 @@ layout {
     center-focused-column "on-overflow" // Don’t auto-center focused column
 
     struts {}
-
+    default-column-width { proportion 0.5; }
     preset-column-widths {
         proportion 0.5
         proportion 0.33333
@@ -81,7 +89,7 @@ layout {
 // ---------------------------------------------------------------------------
 
 window-rule {
-    geometry-corner-radius 13 // Set every window radius to 20
+    geometry-corner-radius 18 // Set every window radius to 20
     clip-to-geometry true
 }
 
@@ -122,6 +130,10 @@ binds {
     Alt+f repeat=false   { spawn "dolphin"; }
     Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
     // Alt+Shift+c repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
+
+    // --- Screenshots --------------------------------------------------------
+    Super+Shift+3 repeat=false { spawn "~/.config/niri/scripts/screenshot-annotate" "output"; }
+    Super+Shift+4 repeat=false { spawn "~/.config/niri/scripts/screenshot-annotate" "region"; }
 
     // Lock screen (Super+Shift+q — mirrors Mod4+Shift+q in Sway)
     Super+Ctrl+q repeat=false allow-inhibiting=false {

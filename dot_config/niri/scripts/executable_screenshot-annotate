@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-region}"
+tmpdir="${XDG_RUNTIME_DIR:-/tmp}"
+file="$tmpdir/niri-screenshot-$(date +%Y%m%d-%H%M%S).png"
+
+case "$mode" in
+  region)
+    geometry="$(slurp -d)"
+    [ -n "$geometry" ] || exit 0
+    grim -g "$geometry" "$file"
+    ;;
+  output)
+    output="$(slurp -o -f '%o')"
+    [ -n "$output" ] || exit 0
+    grim -o "$output" "$file"
+    ;;
+  *)
+    echo "usage: $0 [region|output]" >&2
+    exit 2
+    ;;
+esac
+
+swappy -f "$file"
