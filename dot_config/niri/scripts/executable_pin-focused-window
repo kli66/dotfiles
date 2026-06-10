@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${XDG_RUNTIME_DIR:-/tmp}/niri-focused-anchor"
+
+focused="$(niri msg -j focused-window)"
+id="$(jq -r '.id // empty' <<<"$focused")"
+title="$(jq -r '.title // "untitled"' <<<"$focused")"
+app_id="$(jq -r '.app_id // "unknown"' <<<"$focused")"
+
+if [[ -z "$id" ]]; then
+    notify-send "Niri anchor" "No focused window to pin" || true
+    exit 1
+fi
+
+printf '%s\n' "$id" >"$state_file"
+notify-send "Niri anchor pinned" "$app_id: $title" || true

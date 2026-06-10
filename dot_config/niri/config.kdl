@@ -169,6 +169,11 @@ binds {
     // Show hotkey overlay
     Alt+Shift+slash repeat=false { show-hotkey-overlay; }
 
+    // Anchor a human-focus window, then return to it after agent pings.
+    Alt+grave repeat=false { spawn "~/.config/niri/scripts/focus-pinned-window"; }
+    Alt+p repeat=false { spawn "~/.config/niri/scripts/pin-focused-window"; }
+    Alt+Shift+p repeat=false { spawn "~/.config/niri/scripts/unpin-focused-window"; }
+
     // --- Focus — arrow keys -------------------------------------------------
     Alt+Left             { focus-column-left; }
     Alt+Down             { focus-window-down; }

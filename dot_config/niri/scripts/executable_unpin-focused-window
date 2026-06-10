@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${XDG_RUNTIME_DIR:-/tmp}/niri-focused-anchor"
+
+if [[ ! -s "$state_file" ]]; then
+    notify-send "Niri anchor" "No pinned window" || true
+    exit 0
+fi
+
+id="$(tr -cd '0-9' <"$state_file")"
+rm -f "$state_file"
+notify-send "Niri anchor unpinned" || true
