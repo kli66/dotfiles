@@ -1,0 +1,4 @@
+#!/bin/sh
+
+timeout 2s xprop -root >/dev/null 2>&1 || true
+exec fcitx5 -d

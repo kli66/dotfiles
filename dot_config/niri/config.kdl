@@ -10,11 +10,21 @@ debug {
     honor-xdg-activation-with-invalid-serial
 }
 
+// disable topright hotcorners
+gestures {
+    hot-corners {
+        off
+    }
+}
+
+
 // ---------------------------------------------------------------------------
 // Input
 // ---------------------------------------------------------------------------
 
 input {
+    mod-key "Alt"
+
     keyboard {
         xkb { }
     }
@@ -45,7 +55,7 @@ output "Acer Technologies X34 GS 0x03904FF0" {
 // Switch Event
 // ---------------------------------------------------------------------------
 switch-events {
-    lid-close {spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "lockAndSuspend";}
+    lid-close { spawn "~/.config/niri/scripts/lid-close-policy"; }
 }
 
 
@@ -54,13 +64,17 @@ switch-events {
 // ---------------------------------------------------------------------------
 
 spawn-at-startup "qs" "-c" "noctalia-shell"
-spawn-at-startup "fcitx5" "-d"
+spawn-at-startup "~/.config/niri/scripts/start-fcitx5"
 
 // ---------------------------------------------------------------------------
 // Env
 // ---------------------------------------------------------------------------
 environment {
-  QT_QPA_PLATFORMTHEME "qt6ct"
+  XDG_CURRENT_DESKTOP "niri"
+  QT_QPA_PLATFORM "wayland"
+  ELECTRON_OZONE_PLATFORM_HINT "auto"
+  QT_QPA_PLATFORMTHEME "kde"
+  QT_QPA_PLATFORMTHEME_QT6 "kde"
 }
 
 // ---------------------------------------------------------------------------
@@ -126,10 +140,12 @@ binds {
     Alt+w                { close-window; }
     Alt+t repeat=false   { spawn "ghostty"; }
     Alt+d repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-    Alt+g repeat=false   { spawn "firefox"; }
+    Alt+g repeat=false   { spawn "flatpak" "run" "app.zen_browser.zen"; }
     Alt+f repeat=false   { spawn "dolphin"; }
-    Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
-    // Alt+Shift+c repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "toggleHistory"; }
+    Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:clipper" "toggle"; }
+    Alt+space repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "invokeDefaultAndDismiss" "0"; }
+    //Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
+    Alt+Shift+c repeat=false { center-column; }
 
     // --- Screenshots --------------------------------------------------------
     Super+Shift+3 repeat=false { spawn "~/.config/niri/scripts/screenshot-annotate" "output"; }
@@ -169,8 +185,8 @@ binds {
     Alt+Tab repeat=false { open-overview; }
 
     // --- Workspaces ---------------------------------------------------------
-    //Super+Shift+Up   repeat=false { move-workspace-up; }
-    //Super+Shift+Down repeat=false { move-workspace-down; }
+    Super+Shift+Up   repeat=false { move-workspace-up; }
+    Super+Shift+Down repeat=false { move-workspace-down; }
     Super+Shift+Tab repeat=false { move-workspace-to-monitor-next; }
 
     Alt+1 { focus-workspace "1"; }
@@ -184,16 +200,16 @@ binds {
     Alt+9 { focus-workspace "9"; }
     Alt+0 { focus-workspace "10"; }
 
-    Alt+Shift+1 { move-window-to-workspace "1"; }
-    Alt+Shift+2 { move-window-to-workspace "2"; }
-    Alt+Shift+3 { move-window-to-workspace "3"; }
-    Alt+Shift+4 { move-window-to-workspace "4"; }
-    Alt+Shift+5 { move-window-to-workspace "5"; }
-    Alt+Shift+6 { move-window-to-workspace "6"; }
-    Alt+Shift+7 { move-window-to-workspace "7"; }
-    Alt+Shift+8 { move-window-to-workspace "8"; }
-    Alt+Shift+9 { move-window-to-workspace "9"; }
-    Alt+Shift+0 { move-window-to-workspace "10"; }
+    Alt+Shift+1 { move-window-to-workspace "1" focus=false; }
+    Alt+Shift+2 { move-window-to-workspace "2" focus=false; }
+    Alt+Shift+3 { move-window-to-workspace "3" focus=false; }
+    Alt+Shift+4 { move-window-to-workspace "4" focus=false; }
+    Alt+Shift+5 { move-window-to-workspace "5" focus=false; }
+    Alt+Shift+6 { move-window-to-workspace "6" focus=false; }
+    Alt+Shift+7 { move-window-to-workspace "7" focus=false; }
+    Alt+Shift+8 { move-window-to-workspace "8" focus=false; }
+    Alt+Shift+9 { move-window-to-workspace "9" focus=false; }
+    Alt+Shift+0 { move-window-to-workspace "10" focus=false; }
 
     // --- Media keys (allow-when-locked mirrors Sway --locked) ---------------
     XF86AudioPlay allow-when-locked=true {

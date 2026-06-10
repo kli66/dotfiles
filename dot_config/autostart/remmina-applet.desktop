@@ -6,4 +6,4 @@ Icon=org.remmina.Remmina
 Exec=flatpak run org.remmina.Remmina -i
 Terminal=false
 Type=Application
-Hidden=false
+Hidden=true

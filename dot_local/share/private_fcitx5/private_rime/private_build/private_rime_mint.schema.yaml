@@ -1,0 +1,594 @@
+__build_info:
+  rime_version: 1.16.1
+  timestamps:
+    default: 1780820716
+    default.custom: 1781022052
+    rime_mint.custom: 1781077222
+    rime_mint.schema: 1780820716
+chineseLunarCalendar_translator: lunar
+cn_en:
+  comment_format:
+    - "xform/^.+$//"
+  db_class: stabledb
+  dictionary: ""
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 0.5
+  user_dict: "dicts/rime_ice.cn_en"
+codeLengthLimit_processor: 25
+date_formats:
+  - "Y年m月d日"
+  - "Y-m-d"
+  - "Y/m/d"
+  - Y.m.d
+  - Ymd
+  - "Y年n月j日"
+  - "y年n月j日"
+  - "n月j日"
+datetime_formats:
+  - "Y-m-d H:M:S"
+  - "Y-m-dTH:M:S O"
+  - YmdHMS
+  - "Y年m月d日 H点M分"
+  - "y/m/d I:M p"
+emoji_suggestion:
+  inherit_comment: false
+  opencc_config: emoji.json
+  option_name: emoji_suggestion
+  tips: all
+engine:
+  filters:
+    - "lua_filter@*corrector_filter"
+    - "lua_filter@*super_preedit"
+    - uniquifier
+  processors:
+    - "lua_processor@*codeLengthLimit_processor"
+    - recognizer
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - script_translator
+    - "lua_translator@*force_gc"
+key_binder:
+  bindings:
+    - {accept: "Control+p", send: Up, when: composing}
+    - {accept: "Control+n", send: Down, when: composing}
+    - {accept: "Control+b", send: Left, when: composing}
+    - {accept: "Control+f", send: Right, when: composing}
+    - {accept: "Control+a", send: Home, when: composing}
+    - {accept: "Control+e", send: End, when: composing}
+    - {accept: "Control+d", send: Delete, when: composing}
+    - {accept: "Control+k", send: "Shift+Delete", when: composing}
+    - {accept: "Control+g", send: Escape, when: composing}
+    - {accept: "Alt+v", send: Page_Up, when: composing}
+    - {accept: "Control+v", send: Page_Down, when: composing}
+    - {accept: ISO_Left_Tab, send: "Shift+Left", when: composing}
+    - {accept: "Shift+Tab", send: "Shift+Left", when: composing}
+    - {accept: Tab, send: "Shift+Right", when: composing}
+    - {accept: minus, send: Page_Up, when: paging}
+    - {accept: equal, send: Page_Down, when: has_menu}
+    - {accept: comma, send: Page_Up, when: paging}
+    - {accept: period, send: Page_Down, when: has_menu}
+    - {accept: comma, send: comma, when: predicting}
+    - {accept: period, send: period, when: predicting}
+    - {accept: "Control+Shift+1", select: .next, when: always}
+    - {accept: "Control+Shift+2", toggle: ascii_mode, when: always}
+    - {accept: "Control+Shift+3", toggle: full_shape, when: always}
+    - {accept: "Control+Shift+4", toggle: transcription, when: always}
+    - {accept: "Control+Shift+5", toggle: extended_charset, when: always}
+    - {accept: "Shift+space", toggle: full_shape, when: always}
+    - {accept: "Control+period", toggle: ascii_punct, when: always}
+    - {accept: KP_0, send: 0, when: composing}
+    - {accept: KP_1, send: 1, when: composing}
+    - {accept: KP_2, send: 2, when: composing}
+    - {accept: KP_3, send: 3, when: composing}
+    - {accept: KP_4, send: 4, when: composing}
+    - {accept: KP_5, send: 5, when: composing}
+    - {accept: KP_6, send: 6, when: composing}
+    - {accept: KP_7, send: 7, when: composing}
+    - {accept: KP_8, send: 8, when: composing}
+    - {accept: KP_9, send: 9, when: composing}
+    - {accept: KP_Decimal, send: period, when: composing}
+    - {accept: KP_Multiply, send: asterisk, when: composing}
+    - {accept: KP_Add, send: plus, when: composing}
+    - {accept: KP_Subtract, send: minus, when: composing}
+    - {accept: KP_Divide, send: slash, when: composing}
+    - {accept: KP_Enter, send: Return, when: composing}
+    - {accept: "Control+Shift+E", toggle: emoji_suggestion, when: always}
+    - {accept: "Control+Shift+1", toggle: transcription, when: has_menu}
+    - {accept: "Control+Shift+exclam", toggle: transcription, when: has_menu}
+  import_preset: default
+  shijian_keys:
+    - o
+melt_eng:
+  comment_format:
+    - "xform/.*//"
+  dictionary: melt_eng
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 1.0
+menu:
+  page_size: 6
+punctuator:
+  full_shape:
+    "!": "!"
+    "\"": "\""
+    "#": "#"
+    "$": "$"
+    "%": "%"
+    "&": "&"
+    "'": "'"
+    "(": "("
+    ")": ")"
+    "*": "*"
+    "+": "+"
+    ",": ","
+    "-": "-"
+    .: .
+    "/": "/"
+    ":": ":"
+    ";": ";"
+    "<": "<"
+    "=": "="
+    ">": ">"
+    "?": "?"
+    "@": "@"
+    "[": "["
+    "\\": "\\"
+    "]": "]"
+    "^": "^"
+    _: _
+    "`": "`"
+    "{": "{"
+    "|": "|"
+    "}": "}"
+    "~": "~"
+  half_shape:
+    "!": "!"
+    "\"": "\""
+    "#": "#"
+    "$": "$"
+    "%": "%"
+    "&": "&"
+    "'": "'"
+    "(": "("
+    ")": ")"
+    "*": "*"
+    "+": "+"
+    ",": ","
+    "-": "-"
+    .: .
+    "/": "/"
+    ":": ":"
+    ";": ";"
+    "<": "<"
+    "=": "="
+    ">": ">"
+    "?": "?"
+    "@": "@"
+    "[": "["
+    "\\": "\\"
+    "]": "]"
+    "^": "^"
+    _: _
+    "`": "`"
+    "{": "{"
+    "|": "|"
+    "}": "}"
+    "~": "~"
+radical_reverse_lookup:
+  dictionary: radical_pinyin
+  enable_completion: false
+  enable_sentence: false
+  prefix: Uu
+  tag: radical_lookup
+  tips: "〔拆字〕"
+recognizer:
+  import_preset: default
+  patterns:
+    email: "^[a-z][-_.0-9a-z]*@.*$"
+    expression: "^=.*$"
+    gregorian_to_lunar: "^N[0-9]{1,8}"
+    punct: "^/([0-9]0?|[a-zA-Z]+)$"
+    radical_lookup: "Uu[a-z]*'?$"
+    rmb: "^R[0-9]+[.]?[0-9]*"
+    stroke: "Ui[a-z]*'?$"
+    uppercase: ""
+    url: "^[a-z]+[.].+$"
+    wubi98_mint: "Uw[a-z]*'?$"
+reduce_english_filter:
+  idx: 2
+  mode: all
+  words:
+    - aid
+    - ann
+    - bail
+    - bait
+    - bam
+    - band
+    - bans
+    - bat
+    - bay
+    - bend
+    - bent
+    - benz
+    - bib
+    - bid
+    - bien
+    - biz
+    - boc
+    - bop
+    - bos
+    - bud
+    - buf
+    - cab
+    - cad
+    - cain
+    - cam
+    - cans
+    - cap
+    - cas
+    - cef
+    - chad
+    - chan
+    - chap
+    - chef
+    - cher
+    - chew
+    - chic
+    - chin
+    - chip
+    - chit
+    - coup
+    - cum
+    - cunt
+    - cur
+    - dab
+    - dag
+    - dal
+    - dam
+    - dent
+    - dew
+    - dial
+    - diet
+    - dim
+    - din
+    - dip
+    - dis
+    - dit
+    - doug
+    - dub
+    - dug
+    - dunn
+    - fab
+    - fax
+    - fob
+    - fog
+    - foul
+    - fur
+    - gag
+    - gail
+    - gain
+    - gal
+    - gam
+    - gaol
+    - ged
+    - gel
+    - ger
+    - guam
+    - gus
+    - gut
+    - hail
+    - ham
+    - hank
+    - hans
+    - hat
+    - hay
+    - heil
+    - heir
+    - hem
+    - hep
+    - hud
+    - hum
+    - hung
+    - hunk
+    - hut
+    - jim
+    - jug
+    - kat
+    - lab
+    - lad
+    - lag
+    - laid
+    - lam
+    - laos
+    - lap
+    - lat
+    - lax
+    - lay
+    - led
+    - leg
+    - lex
+    - liam
+    - lib
+    - lid
+    - lied
+    - lien
+    - lies
+    - linn
+    - lip
+    - lit
+    - liz
+    - lob
+    - lug
+    - lund
+    - lung
+    - lux
+    - mag
+    - maid
+    - mann
+    - mar
+    - mat
+    - med
+    - mel
+    - mend
+    - mens
+    - ment
+    - mil
+    - mins
+    - mint
+    - mob
+    - moc
+    - mop
+    - mos
+    - mot
+    - mud
+    - mug
+    - mum
+    - nail
+    - nap
+    - nat
+    - nay
+    - neil
+    - nib
+    - nip
+    - noun
+    - nous
+    - nun
+    - nut
+    - pac
+    - paid
+    - pail
+    - pain
+    - pair
+    - pak
+    - pal
+    - pam
+    - pans
+    - pant
+    - pap
+    - par
+    - pat
+    - paw
+    - pax
+    - pens
+    - pic
+    - pier
+    - pies
+    - pins
+    - pint
+    - pit
+    - pix
+    - pod
+    - pop
+    - pos
+    - pot
+    - pour
+    - pow
+    - pub
+    - rand
+    - rant
+    - rent
+    - rep
+    - res
+    - ret
+    - rex
+    - rib
+    - rid
+    - rig
+    - rim
+    - rub
+    - rug
+    - rum
+    - runc
+    - runs
+    - sac
+    - sail
+    - sal
+    - sam
+    - sans
+    - sap
+    - saw
+    - sax
+    - sew
+    - sham
+    - shaw
+    - shin
+    - sig
+    - sin
+    - sip
+    - sis
+    - suit
+    - sung
+    - suns
+    - sup
+    - sur
+    - sus
+    - tad
+    - tail
+    - taj
+    - tar
+    - tax
+    - tec
+    - ted
+    - tel
+    - ter
+    - tex
+    - tic
+    - tied
+    - tier
+    - ties
+    - tim
+    - tin
+    - tit
+    - tour
+    - tout
+    - tum
+    - wag
+    - wand
+    - womens
+    - wap
+    - wax
+    - weir
+    - won
+    - yan
+    - yen
+reverse_lookup:
+  dictionary: rime_mint
+  overwrite_comment: true
+  tags:
+    - wubi98_mint
+    - stroke
+    - radical_lookup
+schema:
+  author:
+    - "mintimate < @Mintimate|https://www.mintimate.cn >"
+  dependencies:
+    - radical_pinyin
+    - wubi98_mint
+    - stroke
+    - melt_eng
+  description: |
+    Mintimate的薄荷拼音方案。
+    除了参考官方明月拼音，还参考：
+      * chenhe: https://chenhe.me
+      * rime wiki: https://github.com/rime/home/wiki
+      * rime ice: https://github.com/iDvel/rime-ice
+      * Chewing - 新酷音
+      * opencc - 開放中文轉換
+
+  name: "薄荷拼音-全拼输入"
+  schema_id: rime_mint
+  version: 24.11.11
+speller:
+  algebra:
+    - "xlit/āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜü/aaaaooooeeeeiiiiuuuuvvvvv/"
+    - "xform/^ng$/eng/"
+    - "xform/ńg|ňg|ǹg/eng/"
+    - "xform/ń|ň|ǹ/en/"
+    - "erase/^xx$/"
+    - "derive/([aeiou])ng$/$1gn/"
+    - "derive/([dtngkhrzcs])o(u|ng)$/$1o/"
+    - "derive/ong$/on/"
+    - "derive/un$/ong/"
+    - "derive/^([zcs]h).+$/$1/"
+    - "abbrev/^([a-z]).+$/$1/"
+    - "derive/([zcs])h(a|e|i|u|ai|ei|an|en|ou|uo|ua|un|ui|uan|uai|uang|ang|eng|ong)$/h$1$2/"
+    - "derive/([zcs])h([aeiu])$/$1$2h/"
+    - "derive/^([wghk])ai$/$1ia/"
+    - "derive/([qjx])ia$/$1ai/"
+    - "derive/([wtfghkz])ei$/$1ie/"
+    - "derive/([jqx])ie$/$1ei/"
+    - "derive/([rtypsdghklzcbnm])ao$/$1oa/"
+    - "derive/([ypfm])ou$/$1uo/"
+    - "derive/([wrtypsdfghklzcbnm])an$/$1na/"
+    - "derive/([wrpsdfghklzcbnm])en$/$1ne/"
+    - "derive/([wrtypsdfghklzcbnm])ang$/$1nag/"
+    - "derive/([wrtypsdfghklzcbnm])ang$/$1agn/"
+    - "derive/([wrtpsdfghklzcbnm])eng$/$1neg/"
+    - "derive/([wrtpsdfghklzcbnm])eng$/$1egn/"
+    - "derive/([qtypdjlxbnm])ing$/$1nig/"
+    - "derive/([qtypdjlxbnm])ing$/$1ign/"
+    - "derive/([rtysdghklzcn])ong$/$1nog/"
+    - "derive/([rtysdghklzcn])ong$/$1ogn/"
+    - "derive/([qtpdjlxbnm])iao$/$1ioa/"
+    - "derive/([qtpdjlxbnm])iao$/$1oia/"
+    - "derive/([rtsghkzc])ui$/$1iu/"
+    - "derive/([qjlxnm])iu$/$1ui/"
+    - "derive/([qtpdjlxbnm])ian$/$1ain/"
+    - "derive/([qypjlxbnm])in$/$1ni/"
+    - "derive/([qjlxn])iang$/$1aing/"
+    - "derive/([qjlxn])iang$/$1inag/"
+    - "derive/([g|k|h|zh|sh])ua$/$1au/"
+    - "derive/([g|h|k|zh|ch|sh])uai$/$1aui/"
+    - "derive/([g|h|k|zh|ch|sh])uai$/$1uia/"
+    - "derive/([qrtysdghjklzxcn])uan$/$1aun/"
+    - "derive/([qrtysdghjklzxc])un$/$1nu/"
+    - "derive/([nlyjqx])ue$/$1eu/"
+    - "derive/([g|h|k|zh|ch|sh])uang$/$1aung/"
+    - "derive/([g|h|k|zh|ch|sh])uang$/$1uagn/"
+    - "derive/([g|h|k|zh|ch|sh])uang$/$1unag/"
+    - "derive/([g|h|k|zh|ch|sh])uang$/$1augn/"
+    - "derive/([jqx])iong$/$1inog/"
+    - "derive/([jqx])iong$/$1oing/"
+    - "derive/([jqx])iong$/$1iogn/"
+    - "derive/([jqx])iong$/$1oign/"
+    - "derive/([rtsdghkzc])o(u|ng)$/$1o/"
+    - "derive/ong$/on/"
+    - "derive/([tl])eng$/$1en/"
+    - "derive/([qwrtypsdfghjklzxcbnm])([aeio])ng$/$1ng/"
+    - "derive/un$/ong/"
+  alphabet: zyxwvutsrqponmlkjihgfedcba
+  delimiter: " `"
+stroke:
+  dictionary: stroke
+  enable_user_dict: false
+  preedit_format:
+    - "xlit/hspnz/一丨丿丶乙/"
+  prefix: Ui
+  tag: stroke
+  tips: "〔笔画〕"
+switches:
+  []
+time_formats:
+  - "H:M"
+  - "H点M分"
+  - "H:M:S"
+  - "H时M分S秒"
+  - "AI:M"
+  - "I:M P"
+transcription_cc:
+  excluded_types:
+    - reverse_lookup
+  opencc_config: s2t.json
+  option_name: transcription
+  tips: none
+translator:
+  always_show_comments: true
+  comment_format:
+    {}
+  dictionary: rime_mint
+  enable_user_dict: true
+  enable_word_completion: true
+  initial_quality: 1.2
+  preedit_format:
+    - "xform/([nl])v/$1ü/"
+    - "xform/([nl])ue/$1üe/"
+    - "xform/([jqxy])v/$1u/"
+  spelling_hints: 8
+wubi98_mint:
+  dictionary: wubi98_mint
+  enable_completion: true
+  enable_user_dict: false
+  prefix: Uw
+  tag: wubi98_mint
+  tips: "〔五笔〕"

@@ -1,0 +1,97 @@
+patch:
+  switches: []
+
+  engine/processors:
+    - lua_processor@*codeLengthLimit_processor
+    - recognizer
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+
+  engine/segmentors:
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+
+  engine/translators:
+    - punct_translator
+    - script_translator
+    - lua_translator@*force_gc
+
+  engine/filters:
+    - lua_filter@*corrector_filter
+    - lua_filter@*super_preedit
+    - uniquifier
+
+  speller/alphabet: zyxwvutsrqponmlkjihgfedcba
+
+  punctuator/import_preset: null
+  punctuator/full_shape:
+    '!': '!'
+    '"': '"'
+    '#': '#'
+    '$': '$'
+    '%': '%'
+    '&': '&'
+    "'": "'"
+    '(': '('
+    ')': ')'
+    '*': '*'
+    '+': '+'
+    ',': ','
+    '-': '-'
+    '.': '.'
+    '/': '/'
+    ':': ':'
+    ';': ';'
+    '<': '<'
+    '=': '='
+    '>': '>'
+    '?': '?'
+    '@': '@'
+    '[': '['
+    '\': '\'
+    ']': ']'
+    '^': '^'
+    '_': '_'
+    '`': '`'
+    '{': '{'
+    '|': '|'
+    '}': '}'
+    '~': '~'
+  punctuator/half_shape:
+    '!': '!'
+    '"': '"'
+    '#': '#'
+    '$': '$'
+    '%': '%'
+    '&': '&'
+    "'": "'"
+    '(': '('
+    ')': ')'
+    '*': '*'
+    '+': '+'
+    ',': ','
+    '-': '-'
+    '.': '.'
+    '/': '/'
+    ':': ':'
+    ';': ';'
+    '<': '<'
+    '=': '='
+    '>': '>'
+    '?': '?'
+    '@': '@'
+    '[': '['
+    '\': '\'
+    ']': ']'
+    '^': '^'
+    '_': '_'
+    '`': '`'
+    '{': '{'
+    '|': '|'
+    '}': '}'
+    '~': '~'

@@ -1,0 +1,197 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent_buffer_font_size": 13.0,
+  "icon_theme": {
+    "mode": "system",
+    "light": "Colored Zed Icons Theme Light",
+    "dark": "Colored Zed Icons Theme Dark"
+  },
+  "language_models": {
+    "openai_compatible": {
+      "AtomFlow Test": {
+        "api_url": "https://atomflow.vip",
+        "available_models": [
+          {
+            "name": "claude-haiku-4-5",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true,
+              "chat_completions": true,
+              "interleaved_reasoning": false
+            }
+          }
+        ]
+      },
+      "AtomFlow": {
+        "api_url": "https://atomflow.vip/v1",
+        "available_models": [
+          {
+            "name": "gpt-5.5",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true,
+              "chat_completions": true,
+              "interleaved_reasoning": false
+            }
+          }
+        ]
+      }
+    }
+  },
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry"
+    },
+    "claude-acp": {
+      "default_config_options": {
+        "model": "sonnet",
+        "effort": "high"
+      },
+      "type": "registry"
+    }
+  },
+  "debugger": {
+    "button": true,
+    "dock": "bottom"
+  },
+  "mouse_wheel_zoom": true,
+  "proxy": "",
+  "git": {
+    "blame": {
+      "show_avatar": false
+    },
+    "inline_blame": {
+      "show_commit_summary": true
+    }
+  },
+  "format_on_save": "off",
+  "terminal": {
+    "dock": "bottom",
+    "copy_on_select": true
+  },
+  "edit_predictions": {
+    "provider": "open_ai_compatible_api",
+    "open_ai_compatible_api": {
+      "api_url": "https://atomflow.vip",
+      "model": "claude-haiku-4-5"
+    },
+    "allow_data_collection": "no",
+  },
+  "auto_update": false,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false,
+  },
+  "scroll_beyond_last_line": "one_page",
+  "multi_cursor_modifier": "cmd_or_ctrl",
+  "agent_ui_font_size": 16.0,
+  "ui_font_weight": 400.0,
+  "ui_font_family": "CaskaydiaCove Nerd Font Mono",
+  "cli_default_open_behavior": "existing_window",
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "button": false,
+  },
+  "git_panel": {
+    "dock": "left",
+  },
+  "diagnostics": {
+    "button": true,
+  },
+  "project_panel": {
+    "git_status_indicator": true,
+    "bold_folder_labels": true,
+    "entry_spacing": "standard",
+    "dock": "left",
+  },
+  "title_bar": {
+    "show_user_picture": false,
+    "button_layout": "standard",
+    "show_user_menu": false,
+    "show_onboarding_banner": false,
+    "show_branch_status_icon": true,
+  },
+  "window_decorations": "server",
+  "agent": {
+    "dock": "right",
+    "enable_feedback": false,
+    "single_file_review": true,
+    "play_sound_when_agent_done": "always",
+    "sidebar_side": "right",
+    "favorite_models": [],
+    "notify_when_agent_waiting": "all_screens",
+    "model_parameters": [],
+  },
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "ui_font_size": 16,
+  "buffer_font_size": 13.0,
+  "theme": {
+    "mode": "system",
+    "light": "Dayfox - opaque",
+    "dark": "Kanagawa",
+  },
+  "load_direnv": "direct",
+  "languages": {
+    "Python": {
+      "preferred_line_length": 120,
+      "language_servers": ["ruff", "basedpyright"],
+      "format_on_save": "off",
+      "formatter": {
+        "language_server": {
+          "name": "ruff",
+        },
+      },
+      "code_actions_on_format": {
+        "source.organizeImports.ruff": true,
+        //"source.fixAll.ruff": true,
+      },
+    },
+    "JavaScript": {
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
+      },
+    },
+  },
+  "lsp": {
+    "basedpyright": {
+      "settings": {
+        "basedpyright.analysis": {
+          // Editor UX only. Do NOT put type checking modes here.
+          "inlayHints": {
+            "variableTypes": true,
+            "functionReturnTypes": true,
+          },
+        },
+      },
+    },
+    "ruff": {
+      "initialization_options": {
+        "settings": {
+          "configurationPreference": "filesystemFirst",
+        },
+      },
+    },
+  },
+}

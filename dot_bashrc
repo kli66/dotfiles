@@ -25,4 +25,4 @@ fi
 unset rc
 
 source ~/.bash_aliases
-
+eval "$(direnv hook bash)"

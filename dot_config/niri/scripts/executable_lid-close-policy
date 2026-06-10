@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+has_external_output() {
+    local outputs
+
+    if ! outputs="$(niri msg -j outputs 2>/dev/null)"; then
+        return 1
+    fi
+
+    jq -e '
+        to_entries
+        | map(select(
+            ((.key // "") | test("^(eDP|LVDS|DSI)-") | not)
+            and
+            ((.value.name // "") | test("^(eDP|LVDS|DSI)-") | not)
+        ))
+        | length > 0
+    ' >/dev/null <<<"$outputs"
+}
+
+if has_external_output; then
+    exit 0
+fi
+
+qs -c noctalia-shell ipc call sessionMenu lockAndSuspend

@@ -1,0 +1,16 @@
+[Unit]
+Description=Windows ICS SSH SOCKS tunnel
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=10min
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecCondition=/usr/bin/bash -lc '/usr/sbin/ip -4 route get 192.168.137.1 | /usr/bin/grep -q "dev enp198s0f4u1u1"'
+ExecStart=/usr/bin/ssh -N -D 127.0.0.1:18080 -o BatchMode=yes -o PreferredAuthentications=publickey -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/var/home/kai/.ssh/known_hosts -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o TCPKeepAlive=yes -i /var/home/kai/.ssh/windows_ics_ed25519 guosen@192.168.137.1
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target

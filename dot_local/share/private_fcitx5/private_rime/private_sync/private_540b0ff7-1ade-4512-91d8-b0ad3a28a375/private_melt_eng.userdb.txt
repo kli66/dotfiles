@@ -1,0 +1,7 @@
+# Rime user dictionary
+#@/db_name	melt_eng
+#@/db_type	userdb
+#@/rime_version	1.16.1
+#@/tick	1
+#@/user_id	540b0ff7-1ade-4512-91d8-b0ad3a28a375
+Linux 	Linux	c=1 d=1 t=1

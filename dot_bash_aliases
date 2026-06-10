@@ -1,1 +1,3 @@
 alias vim="nvim"
+alias ranger=". ranger"
+alias cdrules="cd /var/home/kai/Documents/GXSC_WORK/BondQuant/strats/python_strats"

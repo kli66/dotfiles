@@ -1,0 +1,143 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      // "j k": "vim::NormalBefore"
+    },
+  },
+  {
+    "context": "AcpThread",
+    "unbind": {
+      "alt-shift-q": "agent::AllowAlways"
+    }
+  },
+  {
+    "context": "AcpThread",
+    "unbind": {
+      "alt-shift-a": "agent::AllowOnce"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-_": "editor::FoldAll"
+    }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-k ctrl-0": "editor::FoldAll"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-+": "editor::UnfoldAll"
+    }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-k ctrl-j": "editor::UnfoldAll"
+    }
+  },
+  {
+    "unbind": {
+      "ctrl--": [
+        "zed::DecreaseBufferFontSize",
+        {
+          "persist": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "Onboarding",
+    "unbind": {
+      "ctrl--": [
+        "zed::DecreaseUiFontSize",
+        {
+          "persist": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "Welcome",
+    "unbind": {
+      "ctrl--": [
+        "zed::DecreaseUiFontSize",
+        {
+          "persist": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-=": "editor::UnfoldLines"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl--": "editor::Fold"
+    }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-}": "editor::UnfoldLines"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-shift-e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "KeymapEditor",
+    "unbind": {
+      "ctrl-alt-f": "keymap_editor::ToggleKeystrokeSearch"
+    }
+  },
+  {
+    "context": "Pane",
+    "unbind": {
+      "ctrl-alt-f": "project_search::ToggleFilters"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-alt-f": "editor::Format"
+    }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-shift-i": "editor::Format"
+    }
+  }
+]
