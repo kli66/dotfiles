@@ -139,5 +139,64 @@
     "unbind": {
       "ctrl-shift-i": "editor::Format"
     }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-l": "editor::SelectLine"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-l": "workspace::ToggleLeftDock"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-b": "workspace::ToggleLeftDock"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-r": [
+        "projects::OpenRecent",
+        {
+          "create_new_window": false
+        }
+      ]
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-?": "agent::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-b": "editor::FindAllReferences"
+    }
+  },
+  {
+    "context": "Editor",
+    "unbind": {
+      "alt-shift-f12": "editor::FindAllReferences"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-r": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-alt-b": "workspace::ToggleRightDock"
+    }
   }
 ]

@@ -10,8 +10,8 @@
   "agent_buffer_font_size": 13.0,
   "icon_theme": {
     "mode": "system",
-    "light": "Colored Zed Icons Theme Light",
-    "dark": "Colored Zed Icons Theme Dark"
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Macchiato"
   },
   "language_models": {
     "openai_compatible": {
@@ -57,11 +57,17 @@
   },
   "agent_servers": {
     "codex-acp": {
+      "default_config_options": {
+        "mode": "auto",
+        "model": "gpt-5.5",
+        "reasoning_effort": "high"
+      },
       "type": "registry"
     },
     "claude-acp": {
       "default_config_options": {
-        "model": "sonnet",
+        "mode": "plan",
+        "model": "opus",
         "effort": "high"
       },
       "type": "registry"
@@ -87,11 +93,14 @@
     "copy_on_select": true
   },
   "edit_predictions": {
-    "provider": "open_ai_compatible_api",
     "open_ai_compatible_api": {
-      "api_url": "https://atomflow.vip",
-      "model": "claude-haiku-4-5"
+      "model": ""
     },
+    "ollama": {
+      "prompt_format": "qwen",
+      "model": "starcoder2:3b-q5_K_M"
+    },
+    "provider": "zed",
     "allow_data_collection": "no",
   },
   "auto_update": false,
@@ -103,7 +112,7 @@
   "multi_cursor_modifier": "cmd_or_ctrl",
   "agent_ui_font_size": 16.0,
   "ui_font_weight": 400.0,
-  "ui_font_family": "CaskaydiaCove Nerd Font Mono",
+  "ui_font_family": "Inter 18pt",
   "cli_default_open_behavior": "existing_window",
   "outline_panel": {
     "dock": "left",
@@ -143,7 +152,7 @@
   },
   "buffer_font_family": "JetBrainsMono Nerd Font",
   "ui_font_size": 16,
-  "buffer_font_size": 13.0,
+  "buffer_font_size": 12.0,
   "theme": {
     "mode": "system",
     "light": "Dayfox - opaque",
