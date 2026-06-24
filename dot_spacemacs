@@ -32,7 +32,16 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '((python :variables
+             python-backend 'lsp
+             python-lsp-server 'pyright
+             python-formatter 'ruff
+             python-format-on-save t)
+     (c-c++ :variables
+            c-c++-backend 'lsp-clangd)
+     lsp
+     git
+     toml
      emacs-lisp
      helm
      markdown
@@ -243,7 +252,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
-   dotspacemacs-emacs-leader-key "M-m"
+   dotspacemacs-emacs-leader-key "s-m"
 
    ;; Major mode leader key is a shortcut key which is the equivalent of
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
@@ -253,7 +262,7 @@ It should only modify the values of Spacemacs settings."
    ;; (default "C-M-m" for terminal mode, "M-<return>" for GUI mode).
    ;; Thus M-RET should work as leader key in both GUI and terminal modes.
    ;; C-M-m also should work in terminal mode, but not in GUI mode.
-   dotspacemacs-major-mode-emacs-leader-key (if window-system "M-<return>" "C-M-m")
+   dotspacemacs-major-mode-emacs-leader-key (if window-system "s-<return>" "C-M-m")
 
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
@@ -361,7 +370,7 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default t) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup t
+   dotspacemacs-maximized-at-startup nil
 
    ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
    ;; variable with `dotspacemacs-maximized-at-startup' to obtain fullscreen
@@ -572,6 +581,14 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
+  ;; use basedpyright from the project's uv venv (.venv/bin/) if present, else skip
+  (defun my/lsp-pyright-use-venv ()
+    (when-let* ((root (locate-dominating-file default-directory ".venv"))
+                (bin (expand-file-name ".venv/bin/basedpyright-langserver" root))
+                (_ (file-executable-p bin)))
+      (setq-local lsp-pyright-langserver-command bin)))
+  (add-hook 'python-mode-hook #'my/lsp-pyright-use-venv)
+
   (defun my/read-claude-creds ()
     (condition-case nil
         (let* ((json-object-type 'alist)
@@ -655,3 +672,55 @@ Call this after switching profiles with cc-switch (SPC o r)."
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(package-selected-packages
+     '(ace-link aggressive-indent aidermacs all-the-icons anaconda-mode auto-compile
+                auto-highlight-symbol avy-jump-helm-line blacken bui
+                centered-cursor-mode claude-code-ide clean-aindent-mode code-cells
+                column-enforce-mode company company-anaconda concurrent ctable
+                cython-mode dap-mode deferred define-word devdocs diminish
+                dired-quick-sort disable-mouse dotenv-mode drag-stuff dumb-jump
+                eat edit-indirect elisp-def elisp-demos elisp-slime-nav ellama emr
+                epc esh-help eshell-prompt-extras eshell-z eval-sexp-fu evil-anzu
+                evil-args evil-cleverparens evil-collection evil-easymotion
+                evil-escape evil-evilified-state evil-exchange evil-goggles
+                evil-iedit-state evil-indent-plus evil-lion evil-lisp-state
+                evil-matchit evil-mc evil-nerd-commenter evil-numbers
+                evil-surround evil-textobj-line evil-tutor evil-unimpaired
+                evil-visual-mark-mode evil-visualstar expand-region eyebrowse
+                fancy-battery flycheck ggtags gh-md golden-ratio google-translate
+                gptel-agent helm-ag helm-comint helm-cscope helm-descbinds
+                helm-make helm-mode-manager helm-org helm-projectile helm-purpose
+                helm-pydoc helm-swoop helm-xref hide-comnt highlight-indentation
+                highlight-numbers highlight-parentheses hl-todo holy-mode
+                hungry-delete hybrid-mode importmagic indent-guide info+ inspector
+                link-hint live-py-mode llama load-env-vars lorem-ipsum lsp-docker
+                lsp-mode lsp-pyright lsp-treemacs macrostep markdown-toc
+                multi-line multi-term multi-vterm nameless open-junk-file
+                org-superstar overseer page-break-lines paradox password-generator
+                pcre2el pet pip-requirements pipenv pippel poetry popwin py-isort
+                pydoc pyenv-mode pylookup python-pytest pythonic pyvenv quickrun
+                rainbow-delimiters reformatter restart-emacs ruff-format shell-pop
+                space-doc spaceline spacemacs-purpose-popwin
+                spacemacs-whitespace-cleanup sphinx-doc string-edit-at-point
+                string-inflection symbol-overlay symon term-cursor terminal-here
+                toc-org toml-mode treemacs-evil treemacs-icons-dired
+                treemacs-persp treemacs-projectile undo-fu-session uuidgen
+                vi-tilde-fringe volatile-highlights vundo wgrep winum
+                writeroom-mode ws-butler xcscope yapfify)))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+  )

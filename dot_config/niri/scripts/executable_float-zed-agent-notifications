@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_file="${XDG_RUNTIME_DIR:-/tmp}/niri-float-zed-agent-notifications.log"
+
+log() {
+    printf '%s %s\n' "$(date -Is)" "$*" >>"$log_file"
+}
+
+float_window_id() {
+    local id="$1"
+
+    [[ -n "$id" ]] || return 0
+    log "moving window $id to floating"
+    niri msg action move-window-to-floating --id "$id" >/dev/null || true
+}
+
+float_matching_windows() {
+    niri msg -j windows \
+        | jq -r '.[] | select(.app_id == "dev.zed.Zed" and .title == null and .is_floating == false) | .id' \
+        | while IFS= read -r id; do
+            float_window_id "$id"
+        done
+}
+
+ids_from_event() {
+    jq -r '
+        if has("WindowsChanged") then
+            .WindowsChanged.windows[]
+        elif has("WindowOpenedOrChanged") then
+            .WindowOpenedOrChanged.window
+        else
+            empty
+        end
+        | select(.app_id == "dev.zed.Zed" and .title == null and .is_floating == false)
+        | .id
+    '
+}
+
+log "started"
+float_matching_windows
+
+niri msg --json event-stream | while IFS= read -r event; do
+    printf '%s\n' "$event" \
+        | ids_from_event \
+        | while IFS= read -r id; do
+            float_window_id "$id"
+        done
+done

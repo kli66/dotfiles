@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Chipmunk File Opener
+Comment=Open log files in Chipmunk
+GenericName=Log viewer tool
+Exec=chipmunk files %F
+Icon=chipmunk
+Type=Application
+NoDisplay=true
+Categories=Utility;Development;
+Keywords=chipmunk;log;viewer;

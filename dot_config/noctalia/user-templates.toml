@@ -1,0 +1,21 @@
+[config]
+
+[templates]
+
+# User-defined templates
+# Add your custom templates below
+# Example:
+# [templates.myapp]
+# input_path = "~/.config/noctalia/templates/myapp.css"
+# output_path = "~/.config/myapp/theme.css"
+# post_hook = "myapp --reload-theme"
+
+# Remove this section and add your own templates
+#[templates.placeholder]
+#input_path = "/etc/xdg/quickshell/noctalia-shell/Assets/Templates/noctalia.json"
+#output_path = "/var/home/kai/.cache/noctalia/placeholder.json"
+
+[templates.kde_noctalia_apply]
+input_path = "~/.config/noctalia/templates/kde-noctalia-apply.state"
+output_path = "~/.cache/noctalia/kde-noctalia-apply.state"
+post_hook = "kwriteconfig6 --file ~/.local/share/color-schemes/noctalia.colors --group General --key ColorScheme noctalia && /etc/xdg/quickshell/noctalia-shell/Scripts/python/src/theming/kde-apply-scheme.py noctalia"
