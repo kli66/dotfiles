@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Managed by chezmoi. Installs the Bluetooth wake-from-suspend udev rule into
+# /etc and reloads udev. chezmoi hashes this *rendered* script, so it re-runs
+# only when the rule body (included below) changes — no sudo prompt otherwise.
+set -euo pipefail
+
+dest=/etc/udev/rules.d/90-bt-wakeup.rules
+
+rule=$(cat <<'RULE'
+{{ includeTemplate "udev-bt-wakeup.rules" }}
+RULE
+)
+
+# Install only if absent or changed, to keep the sudo reload idempotent.
+if ! sudo test -f "$dest" || ! printf '%s\n' "$rule" | sudo cmp -s - "$dest"; then
+  printf '%s\n' "$rule" | sudo install -D -m 0644 /dev/stdin "$dest"
+  sudo udevadm control --reload
+  sudo udevadm trigger --subsystem-match=usb --action=add
+  echo "chezmoi: installed $dest and reloaded udev"
+fi

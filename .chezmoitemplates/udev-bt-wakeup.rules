@@ -1,0 +1,10 @@
+# Arm Bluetooth-keypress wake-from-suspend.
+# Matched by USB class (not vid:pid) so this rule is machine-portable.
+#
+# Bluetooth radio: USB device class E0/01/01 = Wireless / RF / Bluetooth.
+# power/wakeup lives on this same node, so a single ATTR match-and-set works.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{bDeviceClass}=="e0", ATTR{bDeviceSubClass}=="01", ATTR{bDeviceProtocol}=="01", ATTR{power/wakeup}="enabled"
+
+# USB hubs (class 09): the wake signal only reaches the host if every hub
+# between the radio and the root hub is also armed.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{bDeviceClass}=="09", ATTR{power/wakeup}="enabled"
