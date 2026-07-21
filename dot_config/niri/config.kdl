@@ -1,12 +1,20 @@
 // Compositor: niri (scrolling Wayland compositor)
 // Reference:  https://niri-wm.github.io/niri/Configuration:-Introduction.html
+//
+// RECONSTRUCTED 2026-07-21 after config.kdl was accidentally deleted.
+// Custom (non-shell) sections recovered from the chezmoi source
+// (~/.local/share/chezmoi/dot_config/niri/config.kdl, Jun 30, Noctalia era).
+// Shell-managed sections come from the live DankMaterialShell (DMS) fragments
+// in ./dms/*.kdl. Noctalia bits (its keybinds, spawn, and noctalia.kdl include)
+// were dropped because the live shell is DMS (dms.service). See dms/*.kdl for
+// anything auto-generated — edit custom config here, not there.
 
 // remove CSD
 prefer-no-csd
 
 // compatibility with token serial switch to enable click and focus on notifications
 debug {
-    // Allows notification actions and window activation from Noctalia.
+    // Allows notification actions and window activation from the shell.
     honor-xdg-activation-with-invalid-serial
 }
 
@@ -50,15 +58,11 @@ input {
 }
 
 // ---------------------------------------------------------------------------
-// Outputs
+// Outputs  ->  managed by DMS in dms/outputs.kdl (see include below)
 // ---------------------------------------------------------------------------
 
 // niri automatically disables eDP-1 when the lid is closed and re-enables it
 // on open, so no explicit switch-events block is needed for lid handling.
-
-output "Acer Technologies X34 GS 0x03904FF0" {
-    mode "3440x1440@100"
-}
 
 
 // ---------------------------------------------------------------------------
@@ -72,10 +76,16 @@ switch-events {
 // ---------------------------------------------------------------------------
 // Autostart
 // ---------------------------------------------------------------------------
+// NOTE: DankMaterialShell runs as a systemd user service (dms.service), so it
+// is NOT spawned here. The old Noctalia spawn ("qs -c noctalia-shell") was
+// removed during the migration to DMS.
 
-spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "~/.config/niri/scripts/start-fcitx5"
 spawn-at-startup "~/.config/niri/scripts/float-zed-agent-notifications"
+// Silence KDE's drkonqi crash-reporter under niri (no Plasma surface -> it
+// crash-loops). Runtime mask self-clears on logout since Linger=no, so KDE
+// keeps drkonqi.
+spawn-at-startup "systemctl" "--user" "mask" "--runtime" "drkonqi-coredump-launcher@.service"
 
 // ---------------------------------------------------------------------------
 // Env
@@ -89,11 +99,11 @@ environment {
 }
 
 // ---------------------------------------------------------------------------
-// Layout
+// Layout (custom bits; gaps/border widths/colors come from DMS includes below,
+// which niri merges with this block)
 // ---------------------------------------------------------------------------
 layout {
-    gaps 10
-    center-focused-column "on-overflow" // Don’t auto-center focused column
+    center-focused-column "on-overflow" // Don't auto-center focused column
 
     struts {}
     default-column-width { proportion 0.5; }
@@ -106,17 +116,11 @@ layout {
     tab-indicator {
         place-within-column
     }
-
 }
 
 // ---------------------------------------------------------------------------
-// Window Rules
+// Window Rules (custom; global corner-radius/clip now come from dms/layout.kdl)
 // ---------------------------------------------------------------------------
-
-window-rule {
-    geometry-corner-radius 18 // Set every window radius to 20
-    clip-to-geometry true
-}
 
 window-rule {
     // Zed agent waiting notifications report the same app ID as Zed, but no title.
@@ -144,127 +148,13 @@ workspace "9"
 workspace "10"
 
 // ---------------------------------------------------------------------------
-// Key bindings
+// DankMaterialShell managed fragments (auto-generated; edit via DMS settings)
 // ---------------------------------------------------------------------------
-// Modifier conventions (matching Sway):
-//   Alt  ($Mod / Mod1) — primary modifier for window management
-//   Super (Mod4)       — used only for lock screen (Super+Shift+q)
-//
-// niri scrolling model notes:
-//   - left/right navigate between columns
-//   - up/down navigate windows within a column stack
-//   - no manual split direction; columns stack vertically automatically
-//   - resize mode omitted; use mouse drag or Mod+R preset cycling
-
-binds {
-    // --- Applications -------------------------------------------------------
-    Alt+w                { close-window; }
-    Alt+t repeat=false   { spawn "ghostty"; }
-    Alt+d repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-    Alt+g repeat=false   { spawn "flatpak" "run" "app.zen_browser.zen"; }
-    Alt+f repeat=false   { spawn "dolphin"; }
-    Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:clipper" "toggle"; }
-    Alt+space repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "notifications" "invokeDefaultAndDismiss" "0"; }
-    //Alt+c repeat=false   { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
-    Alt+Shift+c repeat=false { center-column; }
-
-    // --- Screenshots --------------------------------------------------------
-    Super+Shift+3 repeat=false { spawn "~/.config/niri/scripts/screenshot-annotate" "output"; }
-    Super+Shift+4 repeat=false { spawn "~/.config/niri/scripts/screenshot-annotate" "region"; }
-
-    // Lock screen (Super+Shift+q — mirrors Mod4+Shift+q in Sway)
-    Super+Ctrl+q repeat=false allow-inhibiting=false {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock";
-    }
-
-    // Session menu (Alt+Shift+e)
-    Alt+Shift+e repeat=false { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "toggle"; }
-
-    // --- Window state -------------------------------------------------------
-    Alt+Shift+space      { toggle-window-floating; }
-    Alt+Shift+r          { switch-preset-column-width; }
-    Alt+Shift+t           { toggle-column-tabbed-display; }
-    Alt+Shift+f          { maximize-column; }
-    Alt+F11		{fullscreen-window;}
-
-    // Show hotkey overlay
-    Alt+Shift+slash repeat=false { show-hotkey-overlay; }
-
-    // Anchor a human-focus window, then return to it after agent pings.
-    Alt+grave repeat=false { spawn "~/.config/niri/scripts/focus-pinned-window"; }
-    Alt+p repeat=false { spawn "~/.config/niri/scripts/pin-focused-window"; }
-    Alt+Shift+p repeat=false { spawn "~/.config/niri/scripts/unpin-focused-window"; }
-
-    // --- Focus — arrow keys -------------------------------------------------
-    Alt+Left             { focus-column-left; }
-    Alt+Down             { focus-window-down; }
-    Alt+Up               { focus-window-up; }
-    Alt+Right            { focus-column-right; }
-
-    // --- Move — arrow keys --------------------------------------------------
-    Alt+Shift+Left       { consume-or-expel-window-left; }
-    Alt+Shift+Down       { move-window-down; }
-    Alt+Shift+Up         { move-window-up; }
-    Alt+Shift+Right      { consume-or-expel-window-right; }
-    Alt+Shift+Tab repeat=false { move-window-to-monitor-next; }
-    // --- Overview -----------------------------------------------------------
-    Alt+Tab repeat=false { open-overview; }
-
-    // --- Workspaces ---------------------------------------------------------
-    Super+Shift+Up   repeat=false { move-workspace-up; }
-    Super+Shift+Down repeat=false { move-workspace-down; }
-    Super+Shift+Tab repeat=false { move-workspace-to-monitor-next; }
-
-    Alt+1 { focus-workspace "1"; }
-    Alt+2 { focus-workspace "2"; }
-    Alt+3 { focus-workspace "3"; }
-    Alt+4 { focus-workspace "4"; }
-    Alt+5 { focus-workspace "5"; }
-    Alt+6 { focus-workspace "6"; }
-    Alt+7 { focus-workspace "7"; }
-    Alt+8 { focus-workspace "8"; }
-    Alt+9 { focus-workspace "9"; }
-    Alt+0 { focus-workspace "10"; }
-
-    Alt+Shift+1 { move-window-to-workspace "1" focus=false; }
-    Alt+Shift+2 { move-window-to-workspace "2" focus=false; }
-    Alt+Shift+3 { move-window-to-workspace "3" focus=false; }
-    Alt+Shift+4 { move-window-to-workspace "4" focus=false; }
-    Alt+Shift+5 { move-window-to-workspace "5" focus=false; }
-    Alt+Shift+6 { move-window-to-workspace "6" focus=false; }
-    Alt+Shift+7 { move-window-to-workspace "7" focus=false; }
-    Alt+Shift+8 { move-window-to-workspace "8" focus=false; }
-    Alt+Shift+9 { move-window-to-workspace "9" focus=false; }
-    Alt+Shift+0 { move-window-to-workspace "10" focus=false; }
-
-    // --- Media keys (allow-when-locked mirrors Sway --locked) ---------------
-    XF86AudioPlay allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "playPause";
-    }
-    XF86AudioNext allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "next";
-    }
-    XF86AudioPrev allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "media" "previous";
-    }
-    XF86AudioMute allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput";
-    }
-    XF86AudioRaiseVolume allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase";
-    }
-    XF86AudioLowerVolume allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease";
-    }
-
-    // --- Brightness keys ----------------------------------------------------
-    XF86MonBrightnessUp allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase";
-    }
-    XF86MonBrightnessDown allow-when-locked=true {
-        spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease";
-    }
-}
-
-
-include "./noctalia.kdl"
+include "dms/layout.kdl"
+include "dms/colors.kdl"
+include "dms/cursor.kdl"
+include "dms/binds.kdl"
+include "dms/outputs.kdl"
+include "dms/windowrules.kdl"
+// include "dms/alttab.kdl"
+// include "dms/wpblur.kdl"
