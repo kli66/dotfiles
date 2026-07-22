@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# notify-window — jump to the window that sent the most recent notification.
+#
+# Modes:
+#   record  Called by the Claude Code Notification hook (runs inside the agent).
+#           Resolves the agent's own terminal window and stores its niri window ID.
+#   focus   Called by the Alt+Space keybind (runs in niri's spawn context).
+#           Focuses the stored window; falls back to the notification center.
+#
+# Reliable only with kitty (one process per window). ghostty shares one PID
+# across all windows, so PID->window is ambiguous there.
+
+set -uo pipefail
+
+STATE_FILE="${XDG_RUNTIME_DIR:-/run/user/$UID}/last-notification-window"
+
+# Emit "pid<TAB>window_id" for every niri window.
+niri_pid_window_pairs() {
+    niri msg windows 2>/dev/null | awk '
+        /^Window ID/ { id = $3; sub(/:$/, "", id) }
+        /^[[:space:]]*PID:/ { print $2 "\t" id }
+    '
+}
+
+record() {
+    local pairs pid win_id depth=0
+    pairs=$(niri_pid_window_pairs)
+    [[ -z "$pairs" ]] && return 0
+
+    # kitty exports KITTY_PID (the window's process); fall back to our own tree.
+    pid="${KITTY_PID:-$PPID}"
+
+    while (( depth++ < 15 )); do
+        win_id=$(awk -v p="$pid" '$1 == p { print $2; exit }' <<<"$pairs")
+        if [[ -n "$win_id" ]]; then
+            printf '%s\n' "$win_id" > "$STATE_FILE.tmp"
+            mv "$STATE_FILE.tmp" "$STATE_FILE"
+            return 0
+        fi
+        pid=$(awk '/^PPid:/ { print $2 }' "/proc/$pid/status" 2>/dev/null)
+        [[ -z "$pid" || "$pid" == 0 || "$pid" == 1 ]] && break
+    done
+    return 0  # never block the notification
+}
+
+focus() {
+    local win_id
+    win_id=$(cat "$STATE_FILE" 2>/dev/null) || win_id=""
+
+    # No stored window, or it's gone -> open the notification center instead.
+    if [[ -z "$win_id" ]] || ! niri_pid_window_pairs | grep -q "	$win_id$"; then
+        exec dms ipc call notifications toggle
+    fi
+
+    niri msg action focus-window --id "$win_id"
+}
+
+case "${1:-focus}" in
+    record) record ;;
+    focus)  focus ;;
+    *) echo "usage: notify-window {record|focus}" >&2; exit 2 ;;
+esac
