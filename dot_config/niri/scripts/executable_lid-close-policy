@@ -23,4 +23,5 @@ if has_external_output; then
     exit 0
 fi
 
-qs -c noctalia-shell ipc call sessionMenu lockAndSuspend
+dms ipc call lock lock
+systemctl suspend
