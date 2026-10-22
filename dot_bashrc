@@ -26,3 +26,44 @@ unset rc
 
 source ~/.bash_aliases
 eval "$(direnv hook bash)"
+. "$HOME/.cargo/env"
+
+# devcontainer aliasing
+alias dcup='devcontainer up --docker-path podman --workspace-folder .'
+alias dcx='devcontainer exec --docker-path podman --workspace-folder . '
+
+
+# Starship prompt (config at ~/.config/starship.toml; Noctalia manages its palette).
+command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+
+# yazi: launch via `y` so the shell follows yazi's last dir on exit.
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+# REMNIC token (manual export needed due to disjoing plugin install in pi)
+export REMNIC_PI_AUTH_TOKEN="$(
+  jq -er '.tokens[] | select(.connector == "pi") | .token' ~/.remnic/tokens.json
+)"
+
+# codex apply_patch command made globally available
+apply_patch() {
+    env --argv0=apply_patch codex "$@"
+}
+
+# spotify_player pipewire lib redirect
+spotify_player() {
+    env ALSA_PLUGIN_DIR="/usr/lib64/alsa-lib/"  "$(brew --prefix spotify_player)/bin/spotify_player" "$@"
+}
+
+# DeepSeek Search/Fetch key, read by pi-web-access via ~/.pi/agent/web-search.json ($DEEPSEEK_OFFICIAL).
+# Store the key in ~/.pi/agent/.deepseek_official (single line, chmod 600), or replace this block
+# with a literal `export DEEPSEEK_OFFICIAL="sk-..."`.
+if [ -z "${DEEPSEEK_OFFICIAL:-}" ] && [ -r "$HOME/.pi/agent/.deepseek_official" ]; then
+    export DEEPSEEK_OFFICIAL="$(<"$HOME/.pi/agent/.deepseek_official")"
+fi

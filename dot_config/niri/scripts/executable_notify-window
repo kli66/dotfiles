@@ -1,62 +1,150 @@
 #!/usr/bin/env bash
-# notify-window — jump to the window that sent the most recent notification.
+# notify-window -- focus the source of the most recently recorded agent notice.
 #
-# Modes:
-#   record  Called by the Claude Code Notification hook (runs inside the agent).
-#           Resolves the agent's own terminal window and stores its niri window ID.
-#   focus   Called by the Alt+Space keybind (runs in niri's spawn context).
-#           Focuses the stored window; falls back to the notification center.
-#
-# Reliable only with kitty (one process per window). ghostty shares one PID
-# across all windows, so PID->window is ambiguous there.
+# record runs inside Kitty and atomically records that terminal's native window
+# ID, per-instance Unix socket, and Kitty public key. The public key is not a
+# credential; it only lets the external client encrypt its password request.
+# focus runs from Niri's Alt+Space binding. It can only issue focus-window via
+# Kitty's password-restricted socket. Missing, invalid, or stale state opens
+# the DMS notification center. Last completed record write wins.
 
 set -uo pipefail
 
-STATE_FILE="${XDG_RUNTIME_DIR:-/run/user/$UID}/last-notification-window"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+STATE_DIR="$RUNTIME_DIR/kitty-agent-notifications"
+STATE_FILE="$STATE_DIR/latest"
+LOCK_FILE="$STATE_DIR/lock"
+PASSWORD_FILE="$HOME/.config/kitty/rc-pass"
+STATE_VERSION=1
 
-# Emit "pid<TAB>window_id" for every niri window.
-niri_pid_window_pairs() {
-    niri msg windows 2>/dev/null | awk '
-        /^Window ID/ { id = $3; sub(/:$/, "", id) }
-        /^[[:space:]]*PID:/ { print $2 "\t" id }
-    '
+prepare_state_dir() {
+    umask 077
+    mkdir -p "$STATE_DIR" 2>/dev/null || return 1
+    chmod 700 "$STATE_DIR" 2>/dev/null || return 1
+}
+
+valid_socket() {
+    local socket=$1 path suffix
+    [[ "$socket" == unix:"$RUNTIME_DIR"/kitty-agent-* ]] || return 1
+    path=${socket#unix:}
+    suffix=${path#"$RUNTIME_DIR/kitty-agent-"}
+    [[ "$suffix" =~ ^[0-9]+$ ]]
+}
+
+valid_public_key() {
+    [[ "$1" =~ ^[[:graph:]]+$ ]]
 }
 
 record() {
-    local pairs pid win_id depth=0
-    pairs=$(niri_pid_window_pairs)
-    [[ -z "$pairs" ]] && return 0
+    local window_id="${KITTY_WINDOW_ID:-}"
+    local socket="${KITTY_LISTEN_ON:-}"
+    local public_key="${KITTY_PUBLIC_KEY:-}"
+    local timestamp tmp lock_fd
 
-    # kitty exports KITTY_PID (the window's process); fall back to our own tree.
-    pid="${KITTY_PID:-$PPID}"
+    [[ "$window_id" =~ ^[0-9]+$ ]] || return 0
+    valid_socket "$socket" || return 0
+    valid_public_key "$public_key" || return 0
+    prepare_state_dir || return 0
 
-    while (( depth++ < 15 )); do
-        win_id=$(awk -v p="$pid" '$1 == p { print $2; exit }' <<<"$pairs")
-        if [[ -n "$win_id" ]]; then
-            printf '%s\n' "$win_id" > "$STATE_FILE.tmp"
-            mv "$STATE_FILE.tmp" "$STATE_FILE"
-            return 0
-        fi
-        pid=$(awk '/^PPid:/ { print $2 }' "/proc/$pid/status" 2>/dev/null)
-        [[ -z "$pid" || "$pid" == 0 || "$pid" == 1 ]] && break
-    done
-    return 0  # never block the notification
+    exec {lock_fd}>"$LOCK_FILE" || return 0
+    flock -x "$lock_fd" || return 0
+
+    tmp=$(mktemp "$STATE_DIR/.latest.XXXXXX") || return 0
+    timestamp=$(date +%s 2>/dev/null || printf '0')
+    {
+        printf 'version=%s\n' "$STATE_VERSION"
+        printf 'window_id=%s\n' "$window_id"
+        printf 'listen_on=%s\n' "$socket"
+        printf 'public_key=%s\n' "$public_key"
+        printf 'recorded_at=%s\n' "$timestamp"
+    } > "$tmp" || {
+        rm -f "$tmp"
+        return 0
+    }
+    chmod 600 "$tmp" 2>/dev/null || {
+        rm -f "$tmp"
+        return 0
+    }
+    mv -f "$tmp" "$STATE_FILE" 2>/dev/null || rm -f "$tmp"
+}
+
+read_state() {
+    local key value line
+    local seen_version=0 seen_window=0 seen_socket=0 seen_key=0 seen_timestamp=0
+
+    [[ -r "$STATE_FILE" ]] || return 1
+    STATE_WINDOW_ID=""
+    STATE_SOCKET=""
+    STATE_PUBLIC_KEY=""
+    STATE_TIMESTAMP=""
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" == *=* ]] || return 1
+        key=${line%%=*}
+        value=${line#*=}
+        case "$key" in
+            version)
+                (( seen_version == 0 )) || return 1
+                [[ "$value" == "$STATE_VERSION" ]] || return 1
+                seen_version=1
+                ;;
+            window_id)
+                (( seen_window == 0 )) || return 1
+                [[ "$value" =~ ^[0-9]+$ ]] || return 1
+                STATE_WINDOW_ID=$value
+                seen_window=1
+                ;;
+            listen_on)
+                (( seen_socket == 0 )) || return 1
+                valid_socket "$value" || return 1
+                STATE_SOCKET=$value
+                seen_socket=1
+                ;;
+            public_key)
+                (( seen_key == 0 )) || return 1
+                valid_public_key "$value" || return 1
+                STATE_PUBLIC_KEY=$value
+                seen_key=1
+                ;;
+            recorded_at)
+                (( seen_timestamp == 0 )) || return 1
+                [[ "$value" =~ ^[0-9]+$ ]] || return 1
+                STATE_TIMESTAMP=$value
+                seen_timestamp=1
+                ;;
+            *) return 1 ;;
+        esac
+    done < "$STATE_FILE"
+
+    (( seen_version && seen_window && seen_socket && seen_key && seen_timestamp ))
+}
+
+password_file_is_private() {
+    local mode
+    [[ -r "$PASSWORD_FILE" && -O "$PASSWORD_FILE" ]] || return 1
+    mode=$(stat -c '%a' "$PASSWORD_FILE" 2>/dev/null) || return 1
+    [[ "$mode" =~ ^[0-7]00$ ]]
+}
+
+open_notification_center() {
+    timeout --foreground 2s dms ipc call notifications open >/dev/null 2>&1 || true
 }
 
 focus() {
-    local win_id
-    win_id=$(cat "$STATE_FILE" 2>/dev/null) || win_id=""
-
-    # No stored window, or it's gone -> open the notification center instead.
-    if [[ -z "$win_id" ]] || ! niri_pid_window_pairs | grep -q "	$win_id$"; then
-        exec dms ipc call notifications toggle
+    if read_state && password_file_is_private; then
+        if timeout --foreground 2s env KITTY_PUBLIC_KEY="$STATE_PUBLIC_KEY" \
+            kitten @ --to "$STATE_SOCKET" --password-file "$PASSWORD_FILE" \
+            --use-password always focus-window --match "id:$STATE_WINDOW_ID" \
+            >/dev/null 2>&1; then
+            return 0
+        fi
     fi
 
-    niri msg action focus-window --id "$win_id"
+    open_notification_center
 }
 
 case "${1:-focus}" in
     record) record ;;
-    focus)  focus ;;
+    focus) focus ;;
     *) echo "usage: notify-window {record|focus}" >&2; exit 2 ;;
 esac

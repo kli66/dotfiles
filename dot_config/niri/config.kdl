@@ -1,13 +1,5 @@
 // Compositor: niri (scrolling Wayland compositor)
 // Reference:  https://niri-wm.github.io/niri/Configuration:-Introduction.html
-//
-// RECONSTRUCTED 2026-07-21 after config.kdl was accidentally deleted.
-// Custom (non-shell) sections recovered from the chezmoi source
-// (~/.local/share/chezmoi/dot_config/niri/config.kdl, Jun 30, Noctalia era).
-// Shell-managed sections come from the live DankMaterialShell (DMS) fragments
-// in ./dms/*.kdl. Noctalia bits (its keybinds, spawn, and noctalia.kdl include)
-// were dropped because the live shell is DMS (dms.service). See dms/*.kdl for
-// anything auto-generated — edit custom config here, not there.
 
 // remove CSD
 prefer-no-csd
@@ -51,11 +43,21 @@ input {
         scroll-method "on-button-down"
         scroll-button 274
     }
+    //mouse {
+	// MX Master 3 thumb wheel: double horizontal scroll distance
+	//scroll-factor horizontal=0.5 vertical=1.0
+    //}
 
-    warp-mouse-to-focus mode="center-xy"
+    warp-mouse-to-focus mode="center-xy-always"
     focus-follows-mouse max-scroll-amount="0%"
     //workspace-auto-back-and-forth
 }
+
+
+// ---------------------------------------------------------------------------
+// Input
+
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Outputs  ->  managed by DMS in dms/outputs.kdl (see include below)
@@ -86,11 +88,14 @@ spawn-at-startup "~/.config/niri/scripts/float-zed-agent-notifications"
 // crash-loops). Runtime mask self-clears on logout since Linger=no, so KDE
 // keeps drkonqi.
 spawn-at-startup "systemctl" "--user" "mask" "--runtime" "drkonqi-coredump-launcher@.service"
+// starts kitty dropdown terminal at startup
+spawn-at-startup "kitten" "quick-access-terminal" "--detach"
 
 // ---------------------------------------------------------------------------
 // Env
 // ---------------------------------------------------------------------------
 environment {
+  EDITOR "nvim"
   XDG_CURRENT_DESKTOP "niri"
   QT_QPA_PLATFORM "wayland"
   ELECTRON_OZONE_PLATFORM_HINT "auto"
@@ -105,13 +110,16 @@ environment {
 // ---------------------------------------------------------------------------
 layout {
     center-focused-column "on-overflow" // Don't auto-center focused column
+    always-center-single-column
 
     struts {}
-    default-column-width { proportion 0.5; }
+    default-column-width { proportion 0.33333; }
     preset-column-widths {
-        proportion 0.5
-        proportion 0.33333
         proportion 0.25
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
     }
 
     tab-indicator {
@@ -132,6 +140,33 @@ window-rule {
     open-focused false
     default-floating-position x=16 y=16 relative-to="bottom-right"
 }
+
+
+// ---------------------------------------------------------------------------
+// Kitty quick-access terminal: match the DMS surface look
+// (layer rules cannot be rounded/bordered by niri; this matches
+//  DankMaterialShell's elevation + non-xray blur instead)
+// ---------------------------------------------------------------------------
+layer-rule {
+    match namespace="^kitty-quick-access$"
+
+    geometry-corner-radius 12      // shapes the blur + shadow only
+    shadow {
+        on
+        softness 40
+        spread 0
+        offset x=0 y=6
+        color "#00000066"
+    }
+    background-effect {
+        blur true
+        xray false                 // real backdrop blur, matching dms/layout.kdl
+        noise 0.03                 // colour banding
+        saturation 1.15
+    }
+}
+
+
 
 // ---------------------------------------------------------------------------
 // Named Workspaces
@@ -159,3 +194,5 @@ include "dms/outputs.kdl"
 include "dms/windowrules.kdl"
 // include "dms/alttab.kdl"
 // include "dms/wpblur.kdl"
+
+include "dms-theme-sync.kdl"

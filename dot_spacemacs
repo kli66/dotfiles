@@ -211,7 +211,8 @@ It should only modify the values of Spacemacs settings."
    ;; package can be defined with `:package', or a theme can be defined with
    ;; `:location' to download the theme package, refer the themes section in
    ;; DOCUMENTATION.org for the full theme specifications.
-   dotspacemacs-themes '(spacemacs-dark
+   dotspacemacs-themes '(noctalia
+                         spacemacs-dark
                          spacemacs-light)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -572,6 +573,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
   )
 
 (defun dotspacemacs/user-config ()
@@ -667,7 +669,217 @@ Call this after switching profiles with cc-switch (SPC o r)."
     (my/register-llm-backends))
 
   ;; SPC o r — refresh LLM backends after a cc-switch profile swap
-  (spacemacs/set-leader-keys "or" #'my/register-llm-backends))
+  (spacemacs/set-leader-keys "or" #'my/register-llm-backends)
+
+  ;; ─────────────────────────── Emacs gptel tutor ───────────────────────────
+  ;; An in-Emacs gptel preset that teaches this Spacemacs/gptel setup while
+  ;; reading live buffer state natively — no Emacs server, no emacsclient.
+  ;; Launch with `SPC o t`, or type `@tutor` in any gptel buffer.
+
+  (defvar my/tutor--last-buffer nil
+    "Most recent non-chat buffer the user was working in.")
+
+  (defun my/tutor--track-buffer (&rest _)
+    "Remember the user's working buffer, ignoring chat and minibuffer."
+    (let ((b (window-buffer (selected-window))))
+      (unless (or (minibufferp b)
+                  (with-current-buffer b (derived-mode-p 'gptel-mode)))
+        (setq my/tutor--last-buffer b))))
+  (add-hook 'window-selection-change-functions #'my/tutor--track-buffer)
+
+  ;; Path guard — credentials are never read or written by any tutor tool.
+  (defun my/tutor--deny-p (path)
+    "Non-nil if PATH must never be touched (credentials, secrets)."
+    (let ((p (expand-file-name path)))
+      (seq-some (lambda (root) (string-prefix-p (expand-file-name root) p))
+                '("~/.claude/" "~/.codex/" "~/.authinfo" "~/.netrc"))))
+  (defun my/tutor--read-root-p (path)
+    "Non-nil if PATH is within a readable root and not denied."
+    (let ((p (expand-file-name path)))
+      (and (not (my/tutor--deny-p p))
+           (seq-some (lambda (r) (string-prefix-p (expand-file-name r) p))
+                     '("~/.spacemacs" "~/.emacs.d/")))))
+  (defun my/tutor--edit-root-p (path)
+    "Non-nil if PATH is within an editable root and not denied."
+    (let ((p (expand-file-name path)))
+      (and (not (my/tutor--deny-p p))
+           (seq-some (lambda (r) (string-prefix-p (expand-file-name r) p))
+                     '("~/.spacemacs" "~/.emacs.d/private/")))))
+
+  (defvar my/tutor-system-prompt
+    (concat
+     "You are an Emacs tutor living inside the user's Spacemacs. The user is an "
+     "Emacs novice using the vim editing style, so the leader key is SPC. "
+     "Answer in this shape, with no preamble and no closing summary:\n"
+     "1. Lead with the keybinding, e.g. `SPC $ g a`. If there is no leader "
+     "binding, give `M-x command-name`.\n"
+     "2. One short sentence on what it does.\n"
+     "3. Optionally 1-3 adjacent bindings under the same prefix the user likely "
+     "wants next.\n"
+     "4. Mention the enabling layer only if the user must enable something.\n\n"
+     "Grounding rules — never invent a binding or command:\n"
+     "- When the user says \"this\", \"here\", \"current\", or \"I\", call "
+     "emacs_current_context first to see their live buffer, mode, and model.\n"
+     "- Confirm any binding or command with emacs_describe or "
+     "emacs_leader_bindings before quoting it. If a tool can't find it, say so "
+     "and suggest `SPC h d k`.\n"
+     "- Read config with emacs_read_config before quoting the user's settings.\n"
+     "- Edit config only when explicitly asked, via emacs_edit_config; afterward "
+     "tell the user to run `SPC f e R` (or `SPC q r`) to apply. Never touch "
+     "credential files.")
+    "System prompt for the Emacs gptel tutor.")
+
+  (with-eval-after-load 'gptel
+    (add-to-list 'gptel-directives (cons 'tutor my/tutor-system-prompt))
+
+    (gptel-make-tool
+     :name "emacs_current_context"
+     :category "emacs-tutor" :confirm nil :include t :args nil
+     :description "Report the buffer the user is actually working in (not the chat buffer), its major mode, file, and the active gptel model and backend."
+     :function
+     (lambda ()
+       (let ((b (or (and (buffer-live-p my/tutor--last-buffer) my/tutor--last-buffer)
+                    (current-buffer))))
+         (with-current-buffer b
+           (format "buffer: %s\nmajor-mode: %s\nfile: %s\ngptel-model: %s\ngptel-backend: %s"
+                   (buffer-name) major-mode (or (buffer-file-name) "—")
+                   (and (boundp 'gptel-model) gptel-model)
+                   (and (boundp 'gptel-backend)
+                        (ignore-errors (gptel-backend-name gptel-backend))))))))
+
+    (gptel-make-tool
+     :name "emacs_describe"
+     :category "emacs-tutor" :confirm nil :include t
+     :description "Describe an Emacs command, function, or variable: its docstring, its leader/global key bindings if any, and (for variables) the current value."
+     :args '((:name "symbol" :type string
+              :description "Name of the command, function, or variable, e.g. \"gptel-send\" or \"gptel-model\"."))
+     :function
+     (lambda (symbol)
+       (let ((sym (intern-soft symbol)))
+         (if (null sym)
+             (format "No such symbol: %s" symbol)
+           (let* ((is-fn (fboundp sym))
+                  (is-var (boundp sym))
+                  (doc (or (and is-fn (ignore-errors (documentation sym)))
+                           (and is-var (documentation-property
+                                        sym 'variable-documentation))
+                           "No documentation."))
+                  (leader (and is-fn
+                               (mapcar (lambda (k) (concat "SPC " (key-description k)))
+                                       (where-is-internal sym spacemacs-default-map))))
+                  (global (and is-fn
+                               (mapcar #'key-description
+                                       (where-is-internal sym (current-global-map))))))
+             (concat
+              (format "%s (%s)\n" symbol
+                      (cond ((and is-fn (commandp sym)) "command")
+                            (is-fn "function") (is-var "variable") (t "symbol")))
+              (when leader (format "leader: %s\n" (string-join leader ", ")))
+              (when global (format "global: %s\n" (string-join global ", ")))
+              (when is-var (format "value: %S\n" (symbol-value sym)))
+              (format "\n%s" doc)))))))
+
+    (gptel-make-tool
+     :name "emacs_leader_bindings"
+     :category "emacs-tutor" :confirm nil :include t
+     :description "List the Spacemacs leader-key bindings under a prefix. Pass the prefix WITHOUT the leading SPC, e.g. \"$g\" for gptel bindings, \"o\" for user bindings, or \"\" for the top level."
+     :args '((:name "prefix" :type string
+              :description "Leader prefix without SPC, e.g. \"$g\", \"o\", or \"\" for top level."))
+     :function
+     (lambda (prefix)
+       (let ((km (if (string= prefix "")
+                     spacemacs-default-map
+                   (lookup-key spacemacs-default-map (kbd prefix)))))
+         (if (keymapp km)
+             (let (out)
+               (map-keymap
+                (lambda (event def)
+                  (let ((kd (key-description (vector event))))
+                    (cond
+                     ((keymapp def) (push (format "SPC %s %s  -> (prefix)" prefix kd) out))
+                     ((symbolp def) (push (format "SPC %s %s  -> %s" prefix kd def) out)))))
+                km)
+               (if out (string-join (nreverse out) "\n")
+                 (format "Prefix `SPC %s` has no bindings." prefix)))
+           (format "`SPC %s` is not a prefix (binding: %s)." prefix km)))))
+
+    (gptel-make-tool
+     :name "emacs_read_config"
+     :category "emacs-tutor" :confirm nil :include t
+     :description "Read a config file (~/.spacemacs or any file under ~/.emacs.d). Optionally restrict to a line range. Credential files are refused."
+     :args '((:name "path" :type string
+              :description "File path, e.g. \"~/.spacemacs\".")
+             (:name "start" :type integer :optional t
+              :description "First line (1-based), inclusive.")
+             (:name "end" :type integer :optional t
+              :description "Last line, inclusive."))
+     :function
+     (lambda (path &optional start end)
+       (if (not (my/tutor--read-root-p path))
+           (format "Refused: %s is outside the allowed roots or is a credential file." path)
+         (condition-case err
+             (with-temp-buffer
+               (insert-file-contents (expand-file-name path))
+               (if (or start end)
+                   (let ((s (or start 1)))
+                     (goto-char (point-min)) (forward-line (1- s))
+                     (let ((beg (point)))
+                       (goto-char (point-min))
+                       (forward-line (or end (line-number-at-pos (point-max))))
+                       (buffer-substring-no-properties beg (point))))
+                 (buffer-string)))
+           (error (format "Error reading %s: %s" path (error-message-string err)))))))
+
+    (gptel-make-tool
+     :name "emacs_edit_config"
+     :category "emacs-tutor" :confirm t :include t
+     :description "Replace an exact string OLD with NEW in a config file (~/.spacemacs or a file under ~/.emacs.d/private/). OLD must occur exactly once. Saves the file. Credential files are refused. Tell the user to run `SPC f e R` afterward."
+     :args '((:name "path" :type string
+              :description "File path, e.g. \"~/.spacemacs\".")
+             (:name "old" :type string
+              :description "Exact text to replace; must match uniquely including whitespace.")
+             (:name "new" :type string
+              :description "Replacement text."))
+     :function
+     (lambda (path old new)
+       (if (not (my/tutor--edit-root-p path))
+           (format "Refused: %s is not an editable config path." path)
+         (condition-case err
+             (with-current-buffer (find-file-noselect (expand-file-name path))
+               (save-excursion
+                 (goto-char (point-min))
+                 (let ((count 0) (pos nil))
+                   (while (search-forward old nil t)
+                     (setq count (1+ count) pos (match-beginning 0)))
+                   (cond
+                    ((= count 0) (format "Not found in %s: no match for OLD." path))
+                    ((> count 1)
+                     (format "Refused: OLD matches %d times in %s; make it unique." count path))
+                    (t (goto-char pos) (search-forward old) (replace-match new t t)
+                       (save-buffer)
+                       (format "Edited %s. Run `SPC f e R` to apply (or `SPC q r` to restart)." path))))))
+           (error (format "Error editing %s: %s" path (error-message-string err)))))))
+
+    (gptel-make-preset 'tutor
+      :description "Emacs/Spacemacs tutor with live buffer + config tools."
+      :backend "Claude"
+      :model 'claude-sonnet-4-6
+      :system 'tutor
+      :tools '("emacs_current_context" "emacs_describe" "emacs_leader_bindings"
+               "emacs_read_config" "emacs_edit_config")))
+
+  (defun my/emacs-tutor ()
+    "Open a gptel chat preloaded with the Emacs-tutor preset."
+    (interactive)
+    (require 'gptel)
+    (let ((buf (gptel "*emacs-tutor*")))
+      (with-current-buffer buf
+        (gptel--apply-preset 'tutor
+                             (lambda (sym val) (set (make-local-variable sym) val))))
+      (pop-to-buffer buf)))
+
+  ;; SPC o t — open the Emacs tutor chat
+  (spacemacs/set-leader-keys "ot" #'my/emacs-tutor))
 
 
 ;; Do not write anything past this comment. This is where Emacs will
