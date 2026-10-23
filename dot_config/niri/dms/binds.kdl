@@ -2,21 +2,25 @@ binds {
     Alt+C repeat=false hotkey-overlay-title="Clipboard Manager" { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
     Alt+D repeat=false hotkey-overlay-title="Application Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Alt+Period hotkey-overlay-title="Notepad: Toggle" { spawn "dms" "ipc" "call" "notepad" "toggle"; }
-    Alt+Shift+E repeat=false { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
     Alt+Space repeat=false hotkey-overlay-title="Jump to Notification Sender" { spawn "~/.config/niri/scripts/notify-window" "focus"; }
+    Alt+Shift+E repeat=false { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
     Super+Ctrl+Q repeat=false allow-inhibiting=false hotkey-overlay-title="Lock Screen" { spawn "dms" "ipc" "call" "lock" "lock"; }
     Super+Shift+3 repeat=false { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "full" "edit"; }
     Super+Shift+4 repeat=false { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "region" "edit"; }
+    Alt+Shift+Slash { show-hotkey-overlay; }
+    Alt+Tab repeat=false { open-overview; }
+    Alt+T hotkey-overlay-title="Open Terminal" repeat=false { spawn "kitty"; }
+    Alt+F repeat=false { spawn "dolphin"; }
+    Alt+G repeat=false { spawn "flatpak" "run" "app.zen_browser.zen"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
-    XF86AudioMute allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
-    XF86AudioNext allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "next"; }
-    XF86AudioPause allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
-    XF86AudioPlay allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
-    XF86AudioPrev allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "previous"; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
+    XF86AudioMute allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
+    XF86AudioPrev allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "previous"; }
+    XF86AudioPlay allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
+    XF86AudioPause allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "playPause"; }
+    XF86AudioNext allow-when-locked=true { spawn "dms" "ipc" "call" "mpris" "next"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
     XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
-    Alt+0 { focus-workspace 10; }
     Alt+1 { focus-workspace 1; }
     Alt+2 { focus-workspace 2; }
     Alt+3 { focus-workspace 3; }
@@ -26,7 +30,7 @@ binds {
     Alt+7 { focus-workspace 7; }
     Alt+8 { focus-workspace 8; }
     Alt+9 { focus-workspace 9; }
-    Alt+Shift+0 { move-window-to-workspace 10 focus=false; }
+    Alt+0 { focus-workspace 10; }
     Alt+Shift+1 { move-window-to-workspace 1 focus=false; }
     Alt+Shift+2 { move-window-to-workspace 2 focus=false; }
     Alt+Shift+3 { move-window-to-workspace 3 focus=false; }
@@ -36,45 +40,51 @@ binds {
     Alt+Shift+7 { move-window-to-workspace 7 focus=false; }
     Alt+Shift+8 { move-window-to-workspace 8 focus=false; }
     Alt+Shift+9 { move-window-to-workspace 9 focus=false; }
-    Super+Shift+Down repeat=false { move-workspace-down; }
-    Super+Shift+Tab repeat=false { move-workspace-to-monitor-next; }
-    Super+Shift+Up repeat=false { move-workspace-up; }
-    Alt+Down { focus-workspace-down; }
-    Alt+F11 { fullscreen-window; }
-    Alt+Left { focus-column-left; }
-    Alt+Right { focus-column-right; }
-    Alt+Shift+C repeat=false { center-column; }
-    Alt+Shift+Down { move-window-to-workspace-down; }
-    Alt+Shift+F { maximize-column; }
-    Alt+Shift+Left { move-column-left; }
-    Alt+Shift+R { switch-preset-column-width; }
-    Alt+Shift+Right { move-column-right; }
-    Alt+Shift+Space { toggle-window-floating; }
-    Alt+Shift+T { toggle-column-tabbed-display; }
-    Alt+Shift+Tab repeat=false { move-window-to-monitor-next; }
-    Alt+Shift+Up { move-window-to-workspace-up; }
+    Alt+Shift+0 { move-window-to-workspace 10 focus=false; }
     Alt+Up { focus-workspace-up; }
+    Alt+K { focus-workspace-up; }
+    Alt+Down { focus-workspace-down; }
+    Alt+J { focus-workspace-down; }
+    Super+Shift+Up repeat=false { move-workspace-up; }
+    Super+Shift+K repeat=false { move-workspace-up; }
+    Super+Shift+Down repeat=false { move-workspace-down; }
+    Super+Shift+J repeat=false { move-workspace-down; }
+    Super+Shift+Tab repeat=false { move-workspace-to-monitor-next; }
+    Alt+Left { focus-column-left; }
+    Alt+H { focus-column-left; }
+    Alt+Right { focus-column-right; }
+    Alt+L { focus-column-right; }
+    Alt+Shift+Left { move-column-left; }
+    Alt+Shift+H { move-column-left; }
+    Alt+Shift+Right { move-column-right; }
+    Alt+Shift+L { move-column-right; }
+    Alt+Shift+Up { move-window-to-workspace-up; }
+    Alt+Shift+K { move-window-to-workspace-up; }
+    Alt+Shift+Down { move-window-to-workspace-down; }
+    Alt+Shift+J { move-window-to-workspace-down; }
+    Alt+Shift+Tab repeat=false { move-window-to-monitor-next; }
+    Alt+Shift+R { switch-preset-column-width; }
+    Alt+Shift+C repeat=false { center-column; }
+    Alt+Shift+F { maximize-column; }
+    Alt+Shift+T { toggle-column-tabbed-display; }
+    Alt+Shift+Space { toggle-window-floating; }
+    Alt+F11 { fullscreen-window; }
     Alt+W { close-window; }
-    Alt+F repeat=false { spawn "dolphin"; }
-    Alt+G repeat=false { spawn "flatpak" "run" "app.zen_browser.zen"; }
-    Alt+T hotkey-overlay-title="Open Terminal" repeat=false { spawn "kitty"; }
-    Alt+Shift+Slash { show-hotkey-overlay; }
-    Alt+Tab repeat=false { open-overview; }
     // Alt + vertical wheel → switch workspaces
-    Alt+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     Alt+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
+    Alt+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
     // Alt + horizontal wheel → focus adjacent window (column)
-    Alt+WheelScrollRight { focus-column-right; }
     Alt+WheelScrollLeft  { focus-column-left; }
+    Alt+WheelScrollRight { focus-column-right; }
 
     // starting dropdown terminal for kitty
-    //Alt+grave repeat=false hotkey-overlay-title="Dropdown Terminal" {
-    //    spawn "kitten" "quick-access-terminal" "--detach";
-    //}
+    Alt+grave repeat=false hotkey-overlay-title="Dropdown Terminal" {
+        spawn "kitten" "quick-access-terminal" "--detach";
+    }
     // pin and unpin window workflow - deprecated, scripts kept
-    // Alt+grave repeat=false { spawn "~/.config/niri/scripts/focus-pinned-window"; }
-    // Alt+P repeat=false { spawn "~/.config/niri/scripts/pin-focused-window"; }
-    // Alt+Shift+P repeat=false { spawn "~/.config/niri/scripts/unpin-focused-window"; }
+    Alt+Escape repeat=false { spawn "~/.config/niri/scripts/focus-pinned-window"; }
+    Alt+P repeat=false { spawn "~/.config/niri/scripts/pin-focused-window"; }
+    Alt+Shift+P repeat=false { spawn "~/.config/niri/scripts/unpin-focused-window"; }
 
 
 }

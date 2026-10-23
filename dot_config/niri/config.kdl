@@ -112,6 +112,11 @@ layout {
     center-focused-column "on-overflow" // Don't auto-center focused column
     always-center-single-column
 
+    // Keep an empty workspace at the very top of every monitor's workspace
+    // list (in addition to the always-present empty one at the bottom), so
+    // focus-workspace-up from the first workspace lands on a fresh empty one.
+    empty-workspace-above-first
+
     struts {}
     default-column-width { proportion 0.33333; }
     preset-column-widths {
@@ -160,7 +165,6 @@ layer-rule {
     }
     background-effect {
         blur true
-        xray false                 // real backdrop blur, matching dms/layout.kdl
         noise 0.03                 // colour banding
         saturation 1.15
     }
@@ -172,16 +176,16 @@ layer-rule {
 // Named Workspaces
 // ---------------------------------------------------------------------------
 
-workspace "1"
-workspace "2"
-workspace "3"
-workspace "4"
-workspace "5"
-workspace "6"
-workspace "7"
-workspace "8"
-workspace "9"
-workspace "10"
+//workspace "1"
+//workspace "2"
+//workspace "3"
+//workspace "4"
+//workspace "5"
+//workspace "6"
+//workspace "7"
+//workspace "8"
+//workspace "9"
+//workspace "10"
 
 // ---------------------------------------------------------------------------
 // DankMaterialShell managed fragments (auto-generated; edit via DMS settings)
